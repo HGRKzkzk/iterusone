@@ -1,9 +1,18 @@
-import { DIMS, defaultOntology, createWorld, tickYear, beliefColor } from "./sim.js";
+import {
+  DIMS,
+  defaultOntology,
+  createWorld,
+  tickYear,
+  beliefColor,
+  applyDetermination
+} from "./sim.js";
+import { discoveryById } from "./discoveries.js";
 
 let world = createWorld(defaultOntology());
 let selected = null;
 let running = true;
 let acc = 0;
+let lastPending = null;
 
 const $ = (id) => document.getElementById(id);
 
@@ -12,27 +21,57 @@ function renderDims() {
   root.innerHTML = "";
   for (const d of DIMS) {
     const sl = world.onto[d.id];
+    const settled = 1 - sl.spread;
     const el = document.createElement("div");
     el.className = "dim";
     el.innerHTML = `
-      <div class="row"><span class="name">${d.name}</span><span>${sl.value.toFixed(2)} · spreiding ${sl.spread.toFixed(2)}</span></div>
+      <div class="row"><span class="name">${d.name}</span>
+        <span>${settled > 0.45 ? "bepaalder" : "onbepaald"}</span></div>
       <div class="poles"><span>${d.a}</span><span>${d.b}</span></div>
-      <input type="range" min="0" max="100" value="${Math.round(sl.value * 100)}" data-k="${d.id}" data-f="value">
-      <input type="range" min="8" max="90" value="${Math.round(sl.spread * 100)}" data-k="${d.id}" data-f="spread">
+      <div class="gap">
+        <i class="bar-true" style="left:${sl.value * 100}%"></i>
+        <i class="spread" style="left:${Math.max(0, sl.value - sl.spread * 0.35) * 100}%;width:${sl.spread * 70}%"></i>
+      </div>
     `;
     root.appendChild(el);
   }
-  root.querySelectorAll("input").forEach((inp) => {
-    inp.addEventListener("input", () => {
-      world.onto[inp.dataset.k][inp.dataset.f] = +inp.value / 100;
-      world.log.unshift({
-        year: world.year,
-        kind: "onto",
-        text: `De werkelijkheid verschuift: ${inp.dataset.k} (${inp.dataset.f}).`
-      });
+}
+
+function renderDialogue() {
+  const box = $("dialogue");
+  if (!world.pending) {
+    const nextHint =
+      world.path.length === 0
+        ? "Wacht tot de eerste doden een vraag maken."
+        : "De wereld draait. Een volgende vraag rijpt uit ervaring.";
+    box.innerHTML = `<h2>Samenspraak</h2>
+      <p class="tag">${nextHint}</p>
+      <ol class="path">${world.path
+        .map((p) => `<li><span class="y">${p.year}</span> ${p.title} — ${p.choice}</li>`)
+        .join("")}</ol>`;
+    return;
+  }
+  const card = discoveryById(world.pending);
+  box.innerHTML = `<h2>Ontdekking</h2>
+    <h3>${card.title}</h3>
+    <p>${card.prompt}</p>
+    <div class="choices"></div>`;
+  const wrap = box.querySelector(".choices");
+  for (const opt of card.options) {
+    const b = document.createElement("button");
+    b.className = "choice";
+    b.textContent = opt.label;
+    b.onclick = () => {
+      applyDetermination(world, opt.id);
+      running = true;
+      $("btn-pause").textContent = "Pauze";
+      renderDialogue();
+      renderDims();
       renderFaith();
-    });
-  });
+      renderLog();
+    };
+    wrap.appendChild(b);
+  }
 }
 
 function renderFaith() {
@@ -48,12 +87,13 @@ function renderFaith() {
     root.appendChild(el);
   }
   const ul = $("streams");
-  ul.innerHTML = world.activeStreams
-    .map(
-      (s) =>
-        `<li class="${s.strength === "strong" ? "" : "weak"}">${s.label} · ${s.size} zielen</li>`
-    )
-    .join("") || "<li class='weak'>Nog geen herkende stromingen.</li>";
+  ul.innerHTML =
+    world.activeStreams
+      .map(
+        (s) =>
+          `<li class="${s.strength === "strong" ? "" : "weak"}">${s.label} · ${s.size} zielen</li>`
+      )
+      .join("") || "<li class='weak'>Nog geen herkende stromingen.</li>";
 }
 
 function renderLog() {
@@ -66,7 +106,8 @@ function renderLog() {
   const sch = Object.values(world.archive.schisms);
   const mom = Object.entries(world.archive.moments);
   a.innerHTML = `
-    <p class="muted">${streams.length} stromingen · ${sch.length} schisma's · ${mom.length} bestaansmomenten</p>
+    <p class="tag">${world.path.length} bepalingen · ${streams.length} stromingen · ${sch.length} schisma's · ${mom.length} momenten</p>
+    ${world.path.map((p) => `<div class="log"><span class="y">${p.year}</span>${p.choice}</div>`).join("")}
     ${streams.map(([n, v]) => `<div class="log"><span class="y">${v.year}</span>${n} <span class="weak">(${v.traditie})</span></div>`).join("")}
     ${sch.map((v) => `<div class="log"><span class="y">${v.year}</span>Schisma: ${v.name} in ${v.village}</div>`).join("")}
     ${mom.map(([n, v]) => `<div class="log moment"><span class="y">${v.year}</span>${n}</div>`).join("")}
@@ -110,8 +151,7 @@ function inspect(p) {
   }
   box.style.display = "block";
   const rows = DIMS.map(
-    (d) =>
-      `${d.name}: ${(p.belief[d.id] * 100) | 0}% (±${(p.conf[d.id] * 100) | 0}%)`
+    (d) => `${d.name}: ${(p.belief[d.id] * 100) | 0}% (±${(p.conf[d.id] * 100) | 0}%)`
   ).join("<br>");
   box.innerHTML = `<h3>${p.name}</h3>
     <div>${world.villages[p.village].name} · ${p.age | 0} jaar ${p.teacher ? "· leraar" : ""}</div>
@@ -129,10 +169,7 @@ function bindMap() {
     for (const p of world.people) {
       if (!p.alive) continue;
       const d = Math.hypot(p.x - x, p.y - y);
-      if (d < bd) {
-        bd = d;
-        best = p;
-      }
+      if (d < bd) { bd = d; best = p; }
     }
     inspect(best);
   });
@@ -143,55 +180,46 @@ function stats() {
   $("pop").textContent = world.people.filter((p) => p.alive).length + " inwoners";
 }
 
-function loop(t) {
+function loop() {
   requestAnimationFrame(loop);
-  if (!running || world.paused) {
-    drawMap();
-    return;
+  if (world.pending && world.pending !== lastPending) {
+    lastPending = world.pending;
+    running = false;
+    $("btn-pause").textContent = "Hervat";
+    renderDialogue();
   }
+  if (!world.pending) lastPending = null;
+  if (!running) { drawMap(); return; }
   acc += world.speed;
-  while (acc >= 1) {
-    tickYear(world);
-    acc -= 1;
-  }
+  while (acc >= 1) { tickYear(world); acc -= 1; }
   renderFaith();
   renderLog();
+  renderDims();
   stats();
   drawMap();
-}
-
-function snapshot() {
-  return JSON.parse(JSON.stringify(world.onto));
 }
 
 export function boot() {
   renderDims();
   renderFaith();
   renderLog();
+  renderDialogue();
   bindMap();
   $("btn-pause").onclick = () => {
     running = !running;
     $("btn-pause").textContent = running ? "Pauze" : "Hervat";
   };
-  $("speed").onchange = (e) => {
-    world.speed = +e.target.value;
-  };
+  $("speed").onchange = (e) => { world.speed = +e.target.value; };
   $("btn-reset").onclick = () => {
     world = createWorld(defaultOntology());
+    lastPending = null;
+    running = true;
+    $("btn-pause").textContent = "Pauze";
     renderDims();
     renderFaith();
     renderLog();
+    renderDialogue();
     inspect(null);
-  };
-  $("btn-split").onclick = () => {
-    const onto = snapshot();
-    world.log.unshift({
-      year: world.year,
-      kind: "onto",
-      text: "Tijdlijn gesplitst: deze wereld loopt door; verschuif één dimensie om te vergelijken (prototype: zelfde venster)."
-    });
-    renderLog();
-    world.onto = onto;
   };
   requestAnimationFrame(loop);
 }
