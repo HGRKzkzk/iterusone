@@ -1,21 +1,18 @@
 # Onbepaald
 
-Browser-godsim. De speler bepaalt alleen wat waar is. Filosofie, religie en cultuur ontstaan uit de bevolking.
+De speler preekt niet. De wereld stelt vragen wanneer ervaring rijp is; jij bepaalt een sliver van wat waar is. Cultuur ontstaat daarna endogeen.
 
-Open `index.html` in een browser, of serveer de map:
+Dat is de Civ-1-loop, ontologisch: tijd loopt → een ontdekking verschijnt → je kiest een pool → de spreiding krimpt → nieuwe takken worden mogelijk.
 
 ```
 npx serve .
 ```
 
-## Spelen
+## Samenspraak
 
-1. Stel de tien dimensies van de werkelijkheid in (waarde + bepaaldheid).
-2. Laat de tijd lopen. Inwoners leren uit ervaring, getuigenis, overdracht en reflectie.
-3. Stromingen worden herkend wanneer clusters in de buurt van historische profielen komen.
-4. Vul het archief: stromingen, schisma's en bestaansmomenten.
+1. Wacht op de eerste doden. Het spel pauzeert.
+2. Bepaal of de dood het einde is, of dat iets doorgaat — of laat het wisselen.
+3. Elke zet opent andere vragen (plaats van voortbestaan, morele orde, zintuigen, grond…).
+4. Inwoners merken het alleen via ervaring. Stromingen worden herkend, niet geplant.
 
-Er is geen winconditie. Het archief vullen is het doel.
-
-Gebaseerd op het concept- en ontwerpdocument van @Wouter (25 sep 2026).
-Phase 2+/3 prototype: alle tien dimensies, houdingen, leraren, 41 profielen, schisma's, bestaansmomenten.
+Geen winconditie. Het pad van bepalingen ís de partij.

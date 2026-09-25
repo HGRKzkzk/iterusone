@@ -28,7 +28,6 @@ button, select {
 button:hover { border-color: var(--accent); }
 button.primary { background: #2a2418; border-color: var(--accent); color: var(--accent); }
 .year { min-width: 7rem; color: var(--accent); letter-spacing: .04em; }
-
 main { display: grid; grid-template-columns: 1.1fr 1fr 1fr; grid-template-rows: 1fr 220px; flex: 1; min-height: 0; }
 .panel { border-right: 1px solid var(--line); overflow: auto; padding: .8rem 1rem; }
 .panel h2 { font-size: .75rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin: 0 0 .6rem; font-weight: 500; }
@@ -37,20 +36,26 @@ canvas#map { width: 100%; height: calc(100% - 2rem); display: block; }
 .legend { font-size: .75rem; color: var(--muted); display: flex; gap: 1rem; }
 .legend span { display: flex; align-items: center; gap: .3rem; }
 .swatch { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-
 .dim { margin-bottom: .7rem; }
 .dim .row { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); }
 .dim .name { color: var(--ink); }
-.dim input[type=range] { width: 100%; accent-color: var(--accent); }
 .poles { display: flex; justify-content: space-between; font-size: .7rem; color: var(--muted); }
-
 #faith .gap { height: 6px; background: #221e18; margin: .25rem 0 .55rem; position: relative; }
 #faith .bar-true { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); }
 #faith .bar-belief { position: absolute; top: 0; bottom: 0; width: 8px; background: var(--accent-2); opacity: .8; margin-left: -4px; }
+.dim .gap { height: 6px; background: #221e18; margin: .25rem 0 .55rem; position: relative; }
+.dim .bar-true { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); }
+.dim .spread { position: absolute; top: 0; bottom: 0; background: #c4a57433; }
+#dialogue h3 { font-weight: 500; margin: .2rem 0 .4rem; }
+#dialogue p { font-size: .9rem; line-height: 1.45; }
+.choices { display: flex; flex-direction: column; gap: .35rem; margin: .6rem 0 1.1rem; }
+button.choice { text-align: left; border-color: var(--accent); background: #1c1812; padding: .55rem .7rem; }
+button.choice:hover { background: #2a2418; }
+.path { padding-left: 1.1rem; font-size: .82rem; color: var(--muted); }
+.path .y { color: var(--accent); }
 .streams { font-size: .85rem; }
 .streams li { margin: .25rem 0; }
 .streams .weak { color: var(--muted); }
-
 #bottom { grid-column: 1 / -1; display: grid; grid-template-columns: 1.4fr 1fr; border-top: 1px solid var(--line); min-height: 0; }
 #chronicle, #archive { overflow: auto; padding: .6rem 1rem; }
 #chronicle { border-right: 1px solid var(--line); }
@@ -58,7 +63,6 @@ canvas#map { width: 100%; height: calc(100% - 2rem); display: block; }
 .log .y { color: var(--accent); margin-right: .4rem; }
 .log .onto { color: var(--warn); }
 .log .moment { color: var(--good); }
-
 #inspector {
   position: absolute; right: .6rem; top: 2.2rem; width: 240px;
   background: #161410ee; border: 1px solid var(--line); padding: .6rem; font-size: .8rem;

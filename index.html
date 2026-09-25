@@ -9,7 +9,7 @@
 <body>
   <header>
     <h1>Onbepaald</h1>
-    <span class="tag">De speler schrijft alleen de werkelijkheid. De rest is endogeen.</span>
+    <span class="tag">Ontdekkingen vragen; jij bepaalt wat waar is. Cultuur volgt.</span>
     <div class="controls">
       <span class="year" id="year">Jaar 0</span>
       <span class="tag" id="pop"></span>
@@ -20,7 +20,6 @@
         <option value="3">Snel</option>
         <option value="8">Eeuw</option>
       </select>
-      <button id="btn-split">Splits tijdlijn</button>
       <button id="btn-reset">Nieuwe wereld</button>
     </div>
   </header>
@@ -35,8 +34,10 @@
       </div>
       <div id="inspector"></div>
     </section>
-    <section class="panel">
+    <section class="panel" id="reality">
+      <div id="dialogue"></div>
       <h2>Werkelijkheid</h2>
+      <p class="tag">Streep = wat waar is. Nevel = hoe onbepaald. Alleen een ontdekking mag dit kantelen.</p>
       <div id="dims"></div>
     </section>
     <section class="panel" id="faith">
