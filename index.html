@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Onbepaald</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Onbepaald</h1>
+    <span class="tag">De speler schrijft alleen de werkelijkheid. De rest is endogeen.</span>
+    <div class="controls">
+      <span class="year" id="year">Jaar 0</span>
+      <span class="tag" id="pop"></span>
+      <button id="btn-pause" class="primary">Pauze</button>
+      <select id="speed">
+        <option value="0.15">Traag</option>
+        <option value="1" selected>Normaal</option>
+        <option value="3">Snel</option>
+        <option value="8">Eeuw</option>
+      </select>
+      <button id="btn-split">Splits tijdlijn</button>
+      <button id="btn-reset">Nieuwe wereld</button>
+    </div>
+  </header>
+  <main>
+    <section class="panel" id="planet">
+      <h2>De planeet</h2>
+      <canvas id="map"></canvas>
+      <div class="legend">
+        <span><i class="swatch" style="background:#c4a574"></i> kleur = overtuiging</span>
+        <span>nevel = onbepaaldheid</span>
+        <span>klik een ziel</span>
+      </div>
+      <div id="inspector"></div>
+    </section>
+    <section class="panel">
+      <h2>Werkelijkheid</h2>
+      <div id="dims"></div>
+    </section>
+    <section class="panel" id="faith">
+      <h2>Geloof</h2>
+      <p class="tag">Streep = wat waar is. Balk = wat men gelooft.</p>
+      <div id="faith-bars"></div>
+      <h2 style="margin-top:1rem">Stromingen</h2>
+      <ul class="streams" id="streams"></ul>
+    </section>
+    <div id="bottom">
+      <section id="chronicle">
+        <h2>Kroniek</h2>
+        <div id="log"></div>
+      </section>
+      <section id="archive">
+        <h2>Archief</h2>
+        <div id="arch"></div>
+      </section>
+    </div>
+  </main>
+  <script type="module">
+    import { boot } from "./js/ui.js";
+    boot();
+  </script>
+</body>
+</html>
